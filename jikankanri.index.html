@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow">
+    <title>テナント入退室管理（30時間制表示対応）</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <style>
+        /* 全要素に対して「線と余白を幅に含める」設定 */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #374151;
+            --in-gradient-start: #34d399;
+            --in-gradient-end: #059669;
+            --out-gradient-start: #60a5fa;
+            --out-gradient-end: #2563eb;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --text-light: #6b7280;
+            --accent-color: #8b5cf6;
+            --link-color: #0ea5e9;
+            --danger-color: #ef4444;
+            --undo-color: #f59e0b;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-floating: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+            --border-radius-lg: 16px;
+            --border-radius-xl: 24px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px 15px;
+            color: var(--text-color);
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden; 
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding-bottom: 80px;
+        }
+
+        @keyframes popClick {
+            0% { transform: scale(1); }
+            40% { transform: scale(0.95); opacity: 0.9; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .anim-active { animation: popClick 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        header { text-align: center; margin-bottom: 20px; }
+        h1 { font-size: 1.6rem; margin: 0 0 8px 0; color: var(--primary-color); letter-spacing: 0.05em; }
+        #dateDisplay { font-size: 1rem; font-weight: 600; color: var(--text-light); background: #eef2ff; display: inline-block; padding: 4px 12px; border-radius: 20px; }
+
+        .tabs-area {
+            display: flex; background: #e2e8f0; border-radius: var(--border-radius-lg);
+            padding: 4px; margin-bottom: 25px;
+        }
+        .tab-btn {
+            flex: 1; padding: 12px; border: none; background: transparent; color: var(--text-light);
+            font-weight: 700; font-size: 1rem; border-radius: 12px; cursor: pointer; transition: all 0.2s;
+        }
+        .tab-btn.active { background: #fff; color: var(--primary-color); box-shadow: var(--shadow-sm); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .controls-area { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        .btn-global {
+            padding: 14px; font-size: 0.95rem; font-weight: 700; border-radius: var(--border-radius-lg);
+            border: 2px solid transparent; background: var(--card-bg); color: var(--primary-color);
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            box-shadow: var(--shadow-md); transition: all 0.2s;
+        }
+        .btn-undo { color: var(--undo-color); border-color: var(--undo-color); background: #fffbeb; }
+        .btn-undo:disabled { color: #d1d5db; border-color: #e5e7eb; background-color: #f9fafb; box-shadow: none; cursor: not-allowed; }
+        .btn-reset-time { color: var(--danger-color); border-color: #fecaca; background: #fef2f2; }
+
+        .add-form {
+            background: var(--card-bg); padding: 20px; border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-md); display: flex; flex-direction: column; gap: 15px; margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.7);
+        }
+        .input-large {
+            padding: 14px; border: 2px solid #e5e7eb; border-radius: var(--border-radius-lg);
+            font-size: 1rem; -webkit-appearance: none; background: #f9fafb; width: 100%;
+        }
+        .input-large:focus { outline: none; border-color: var(--accent-color); background: #fff; }
+        .btn-add {
+            background: linear-gradient(135deg, #4b5563, #1f2937); color: white; border: none;
+            padding: 16px; border-radius: var(--border-radius-lg); font-size: 1.1rem; font-weight: 700;
+            box-shadow: var(--shadow-md); width: 100%;
+        }
+        .count-display { text-align: right; font-size: 0.85rem; color: var(--text-light); margin-bottom: 25px; font-weight: 500; }
+
+        .tenant-list { display: flex; flex-direction: column; gap: 20px; min-height: 50px; }
+        .tenant-card {
+            background: var(--card-bg); border-radius: var(--border-radius-xl); padding: 20px;
+            box-shadow: var(--shadow-md); position: relative; border: 1px solid #f1f5f9;
+            touch-action: pan-y; 
+        }
+
+        .edit-mark { font-size: 1rem; color: var(--accent-color); opacity: 0.8; }
+        .card-header { display: flex; align-items: center; margin-bottom: 18px; }
+        
+        .name-wrapper {
+            display: flex; align-items: center; justify-content: space-between; flex-grow: 1;
+            padding: 12px 16px; margin-right: 12px; background: #f3f4f6;
+            border-radius: var(--border-radius-lg); cursor: pointer;
+            transition: background 0.2s;
+        }
+        .name-wrapper:active { background: #e2e8f0; }
+
+        .tenant-name-display {
+            font-size: 1.2rem; font-weight: 700; color: var(--text-color);
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 10px;
+        }
+        .drag-handle {
+            font-size: 2rem; color: #d1d5db; padding: 5px 15px; cursor: grab;
+            transition: color 0.2s; touch-action: none; 
+        }
+        .drag-handle:active { color: var(--accent-color); }
+
+        .time-row { display: flex; gap: 12px; margin-bottom: 18px; }
+        .time-col {
+            flex: 1; background: #f9fafb; border-radius: var(--border-radius-lg);
+            padding: 14px 10px; display: flex; flex-direction: column; align-items: center;
+            border: 2px solid transparent; transition: all 0.2s;
+        }
+        .time-col.has-value { background: #fff; border-color: #e5e7eb; box-shadow: var(--shadow-sm); }
+        .time-col:active { border-color: var(--accent-color); background: #f5f3ff; }
+
+        .time-label { font-size: 0.8rem; font-weight: 600; color: var(--text-light); margin-bottom: 6px; }
+        .time-value-display {
+            font-size: 1.4rem; font-weight: 700; font-family: monospace; color: var(--text-color);
+            min-height: 1.6rem; display: flex; align-items: center; gap: 6px;
+        }
+        .time-placeholder { color: #d1d5db; font-weight: 400; }
+
+        .action-row { display: flex; gap: 12px; }
+        .btn-action {
+            flex: 1; padding: 16px 0; border: none; border-radius: var(--border-radius-lg);
+            color: white; font-size: 1.1rem; font-weight: 700;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            line-height: 1.2; box-shadow: var(--shadow-md); position: relative; overflow: hidden;
+        }
+        .btn-action::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0)); pointer-events: none;
+        }
+        .btn-in { background: linear-gradient(135deg, var(--in-gradient-start), var(--in-gradient-end)); }
+        .btn-out { background: linear-gradient(135deg, var(--out-gradient-start), var(--out-gradient-end)); }
+        .btn-delete {
+            width: 50px; background-color: white; color: var(--text-light); border: 2px solid #e5e7eb;
+            border-radius: var(--border-radius-lg); font-size: 1.3rem; transition: all 0.2s;
+        }
+        
+        .sortable-ghost { opacity: 0.4; background: #e2e8f0; border: 2px dashed #94a3b8; }
+        .sortable-drag { opacity: 1; background: #ffffff; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); transform: scale(1.02); z-index: 9999; }
+
+        /* 共有画面 */
+        .share-container { background: var(--card-bg); border-radius: var(--border-radius-xl); padding: 25px; box-shadow: var(--shadow-md); }
+        .share-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .share-title { font-size: 1.2rem; font-weight: 700; color: var(--text-color); margin-right: auto; }
+        .share-buttons { display: flex; gap: 8px; }
+        .btn-copy, .btn-link {
+            border: none; padding: 10px 16px; border-radius: var(--border-radius-lg);
+            font-weight: 700; font-size: 0.85rem; display: flex; align-items: center;
+            justify-content: center; gap: 6px; box-shadow: var(--shadow-sm); color: white; white-space: nowrap;
+        }
+        .btn-copy { background: var(--accent-color); }
+        .btn-link { background: var(--link-color); }
+        .share-list { display: flex; flex-direction: column; gap: 0; border: 1px solid #e5e7eb; border-radius: var(--border-radius-lg); overflow: hidden; }
+        .share-item { padding: 15px; border-bottom: 1px solid #f1f5f9; background: #fff; display: flex; flex-direction: column; gap: 5px; }
+        .share-item:last-child { border-bottom: none; }
+        .share-item.has-data { background: #fdfcff; }
+        .share-name { font-weight: 700; color: var(--text-color); font-size: 1rem; }
+        .share-times { display: flex; gap: 15px; font-family: monospace; font-size: 1.1rem; color: var(--text-light); }
+        .share-time-label { font-size: 0.8rem; color: #9ca3af; margin-right: 4px; }
+        .time-accent { color: var(--text-color); font-weight: bold; }
+
+        /* モーダル */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center;
+            z-index: 99999; backdrop-filter: blur(5px);
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: #fff; 
+            width: 90%; 
+            max-width: 400px;
+            border-radius: var(--border-radius-xl); 
+            padding: 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 90vh; overflow-y: auto;
+        }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .modal-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 20px; text-align: center; color: var(--text-color); }
+        
+        .modal-input-group { 
+            margin: 0 auto 20px auto; 
+            text-align: center; 
+            width: 100%; 
+        }
+        
+        .modal-input {
+            display: block; 
+            width: 100% !important; 
+            height: 52px; 
+            margin: 0;
+            padding: 13px 15px; 
+            font-size: 1.3rem; 
+            border: 2px solid #e5e7eb;
+            border-radius: var(--border-radius-lg); 
+            text-align: center; 
+            background: #f9fafb;
+            box-sizing: border-box !important;
+            -webkit-appearance: none;
+            line-height: normal; 
+        }
+        .modal-input:focus { border-color: var(--accent-color); background: #fff; outline: none; }
+        
+        .btn-modal-clear { 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100% !important;
+            height: 52px; 
+            background: #fee2e2; 
+            color: var(--danger-color); 
+            margin: 0 0 20px 0; 
+            padding: 0; 
+            border-radius: var(--border-radius-lg); 
+            border: none; 
+            font-weight: 700;
+            box-sizing: border-box !important;
+            font-size: 1rem;
+        }
+
+        .modal-buttons { display: flex; gap: 12px; margin-top: 10px; }
+        .btn-modal { 
+            flex: 1; 
+            height: 52px; 
+            padding: 0; 
+            border: none; 
+            border-radius: var(--border-radius-lg); 
+            font-weight: 700; 
+            font-size: 1rem; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-modal-cancel { background: #f3f4f6; color: var(--text-light); }
+        .btn-modal-save { background: linear-gradient(135deg, var(--accent-color), #6d28d9); color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>テナント入退室管理</h1>
+        <div id="dateDisplay"></div>
+    </header>
+
+    <div class="tabs-area anim-target">
+        <button class="tab-btn active" onclick="switchTab('input')">入力</button>
+        <button class="tab-btn" onclick="switchTab('share')">データ共有</button>
+    </div>
+
+    <div id="tab-input" class="tab-content active">
+        <div class="controls-area">
+            <button id="btnUndo" class="btn-global btn-undo anim-target" onclick="executeUndo()" disabled>?? 元に戻す</button>
+            <button class="btn-global btn-reset-time anim-target" onclick="resetAllTimes()">?? 時間クリア</button>
+        </div>
+
+        <div class="add-form">
+            <input type="text" id="tenantNameInput" class="input-large" placeholder="テナント名 (例: 株式会社A)">
+            <button class="btn-add anim-target" onclick="addTenant()">＋ 追加する</button>
+        </div>
+        <div class="count-display">
+            登録数: <span id="countDisplay">0</span> / 50
+        </div>
+
+        <div id="tenantList" class="tenant-list"></div>
+    </div>
+
+    <div id="tab-share" class="tab-content">
+        <div class="share-container">
+            <div class="share-header">
+                <div class="share-title">入退室一覧</div>
+                <div class="share-buttons">
+                    <button class="btn-copy anim-target" onclick="copyShareText()">?? テキストをコピー</button>
+                    <button class="btn-link anim-target" onclick="openKeijiban()">?? 掲示板で共有</button>
+                </div>
+            </div>
+            <div id="shareList" class="share-list"></div>
+            <div style="margin-top: 15px; text-align: center; font-size: 0.85rem; color: #9ca3af;">
+                ※入力があるデータのみ表示されています
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="editModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-title" id="modalTitle">編集</div>
+        <div class="modal-input-group">
+            <input type="text" id="modalNameInput" class="modal-input" style="display:none;">
+            <input type="time" id="modalTimeInput" class="modal-input" style="display:none;">
+        </div>
+        <button id="modalClearBtn" class="btn-modal-clear anim-target" style="display:none;" onclick="clearModalValue()">??? 時間を消去する</button>
+        <div class="modal-buttons">
+            <button class="btn-modal btn-modal-cancel anim-target" onclick="closeModal()">キャンセル</button>
+            <button class="btn-modal btn-modal-save anim-target" onclick="saveModal()">決定 ?</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // アニメーション
+    document.addEventListener('click', function(e) {
+        const target = e.target.closest('button, .anim-target');
+        if (target && !target.disabled) {
+            target.classList.remove('anim-active');
+            void target.offsetWidth; 
+            target.classList.add('anim-active');
+            setTimeout(() => { target.classList.remove('anim-active'); }, 200);
+        }
+    });
+
+    let tenants = [];
+    let historyStack = [];
+    const MAX_HISTORY = 50;
+    let currentEditId = null;
+    let currentEditType = null;
+    let sortableInstance = null;
+
+    window.onload = function() {
+        displayDate();
+        if (localStorage.getItem('mobileTenantApp_v7_30h')) {
+            tenants = JSON.parse(localStorage.getItem('mobileTenantApp_v7_30h'));
+        }
+        renderTenants();
+        updateUndoButton();
+        initSortable();
+    };
+
+    function openKeijiban() { window.open('https://gleamize.github.io/keijiban/', '_blank'); }
+
+    // --- 30時間制変換関数 ---
+    function to30h(timeStr) {
+        if (!timeStr) return '--:--';
+        // "HH:mm" を分割して数値化
+        const parts = timeStr.split(':');
+        let h = parseInt(parts[0], 10);
+        const m = parts[1];
+
+        // 0時?6時なら+24する
+        if (h <= 6) {
+            h += 24;
+        }
+        // 数値を文字列に戻す（例: 25:30）
+        return `${h}:${m}`;
+    }
+
+    function switchTab(tabName) {
+        const btns = document.querySelectorAll('.tab-btn');
+        btns.forEach(btn => btn.classList.remove('active'));
+        if(tabName === 'input') btns[0].classList.add('active');
+        else btns[1].classList.add('active');
+
+        document.getElementById('tab-input').classList.remove('active');
+        document.getElementById('tab-share').classList.remove('active');
+        document.getElementById('tab-' + tabName).classList.add('active');
+        if (tabName === 'share') renderShareList();
+    }
+
+    function renderShareList() {
+        const list = document.getElementById('shareList');
+        list.innerHTML = '';
+        const activeTenants = tenants.filter(t => t.inTime || t.outTime);
+        if (activeTenants.length === 0) {
+            list.innerHTML = '<div style="padding:40px 20px; text-align:center; color:#999;">記録データはありません</div>';
+            return;
+        }
+        activeTenants.forEach(tenant => {
+            const item = document.createElement('div');
+            item.className = 'share-item has-data';
+            
+            // ここで30時間制に変換して表示
+            const inTimeStr = tenant.inTime ? `<span class="time-accent">${to30h(tenant.inTime)}</span>` : '--:--';
+            const outTimeStr = tenant.outTime ? `<span class="time-accent">${to30h(tenant.outTime)}</span>` : '--:--';
+            
+            item.innerHTML = `
+                <div class="share-name">${tenant.name}</div>
+                <div class="share-times">
+                    <div><span class="share-time-label">IN</span>${inTimeStr}</div>
+                    <div><span class="share-time-label">OUT</span>${outTimeStr}</div>
+                </div>
+            `;
+            list.appendChild(item);
+        });
+    }
+
+    function copyShareText() {
+        const activeTenants = tenants.filter(t => t.inTime || t.outTime);
+        if (activeTenants.length === 0) return alert('記録データがありません');
+        const dateStr = document.getElementById('dateDisplay').innerText;
+        let text = `【入退室記録】 ${dateStr}\n----------------\n`;
+        activeTenants.forEach(tenant => {
+            // ここでも30時間制に変換してテキスト生成
+            const inT = to30h(tenant.inTime);
+            const outT = to30h(tenant.outTime);
+            text += `${tenant.name}\n入: ${inT}  退: ${outT}\n\n`;
+        });
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => alert('コピーしました！')).catch(() => alert('コピー失敗'));
+        } else {
+            const ta = document.createElement('textarea');
+            ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+            alert('コピーしました！');
+        }
+    }
+
+    // --- メイン機能 ---
+    function initSortable() {
+        const el = document.getElementById('tenantList');
+        sortableInstance = Sortable.create(el, {
+            handle: '.drag-handle', animation: 150, delay: 200, delayOnTouchOnly: true,
+            ghostClass: 'sortable-ghost', dragClass: 'sortable-drag',
+            onEnd: function (evt) {
+                if (evt.oldIndex !== evt.newIndex) {
+                    saveHistory();
+                    const item = tenants.splice(evt.oldIndex, 1)[0];
+                    tenants.splice(evt.newIndex, 0, item);
+                    saveData();
+                }
+            }
+        });
+    }
+
+    function displayDate() {
+        const now = new Date();
+        const days = ['日', '月', '火', '水', '木', '金', '土'];
+        document.getElementById('dateDisplay').textContent = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日(${days[now.getDay()]})`;
+    }
+    function saveData() { localStorage.setItem('mobileTenantApp_v7_30h', JSON.stringify(tenants)); }
+    function saveHistory() {
+        historyStack.push(JSON.stringify(tenants));
+        if (historyStack.length > MAX_HISTORY) historyStack.shift();
+        updateUndoButton();
+    }
+    function executeUndo() {
+        if (historyStack.length === 0) return;
+        tenants = JSON.parse(historyStack.pop());
+        saveData();
+        renderTenants();
+        if(document.getElementById('tab-share').classList.contains('active')) renderShareList();
+        updateUndoButton();
+    }
+    function updateUndoButton() { document.getElementById('btnUndo').disabled = (historyStack.length === 0); }
+    function getCurrentTime() { return new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }); }
+
+    function addTenant() {
+        const input = document.getElementById('tenantNameInput');
+        const name = input.value.trim();
+        if (!name) return alert('テナント名を入力');
+        if (tenants.length >= 50) return alert('登録上限です');
+        if (tenants.some(t => t.name === name)) return alert('登録済みです');
+        saveHistory();
+        tenants.push({ id: Date.now(), name: name, inTime: '', outTime: '' });
+        input.value = '';
+        saveData();
+        renderTenants();
+    }
+    function deleteTenant(id) {
+        if(!confirm('削除しますか？')) return;
+        saveHistory();
+        tenants = tenants.filter(t => t.id !== id);
+        saveData();
+        renderTenants();
+    }
+    function setNowTime(id, type) {
+        saveHistory();
+        const tenant = tenants.find(t => t.id === id);
+        if(tenant) {
+            type === 'in' ? tenant.inTime = getCurrentTime() : tenant.outTime = getCurrentTime();
+            saveData();
+            renderTenants();
+        }
+    }
+    function resetAllTimes() {
+        if(!confirm('全リセットしますか？')) return;
+        saveHistory();
+        tenants.forEach(t => { t.inTime = ''; t.outTime = ''; });
+        saveData();
+        renderTenants();
+    }
+
+    // --- 編集モーダル制御 ---
+    function openModal(id, type) {
+        const tenant = tenants.find(t => t.id === id);
+        if (!tenant) return;
+        
+        currentEditId = id;
+        currentEditType = type;
+
+        const modal = document.getElementById('editModal');
+        const title = document.getElementById('modalTitle');
+        const nameInput = document.getElementById('modalNameInput');
+        const timeInput = document.getElementById('modalTimeInput');
+        const clearBtn = document.getElementById('modalClearBtn');
+
+        nameInput.style.display = 'none';
+        timeInput.style.display = 'none';
+        clearBtn.style.display = 'none';
+
+        if (type === 'name') {
+            title.innerText = 'テナント名の編集';
+            nameInput.style.display = 'block';
+            nameInput.value = tenant.name;
+            setTimeout(() => nameInput.focus(), 300);
+        } else {
+            title.innerText = (type === 'in' ? '入室' : '退室') + '時間の編集';
+            timeInput.style.display = 'block';
+            timeInput.value = (type === 'in' ? tenant.inTime : tenant.outTime);
+            clearBtn.style.display = 'block';
+        }
+        modal.classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('editModal').classList.remove('active');
+        currentEditId = null;
+        currentEditType = null;
+    }
+    function clearModalValue() { document.getElementById('modalTimeInput').value = ''; }
+
+    function saveModal() {
+        if (currentEditId === null) return;
+        const tenant = tenants.find(t => t.id === currentEditId);
+        if (!tenant) return closeModal();
+
+        saveHistory();
+
+        if (currentEditType === 'name') {
+            const val = document.getElementById('modalNameInput').value.trim();
+            if (val) tenant.name = val;
+        } else if (currentEditType === 'in') {
+            tenant.inTime = document.getElementById('modalTimeInput').value;
+        } else if (currentEditType === 'out') {
+            tenant.outTime = document.getElementById('modalTimeInput').value;
+        }
+        
+        saveData();
+        renderTenants();
+        closeModal();
+    }
+
+    // --- 描画 ---
+    function renderTenants() {
+        const list = document.getElementById('tenantList');
+        document.getElementById('countDisplay').innerText = tenants.length;
+        list.innerHTML = '';
+
+        tenants.forEach((tenant, index) => {
+            const card = document.createElement('div');
+            card.className = 'tenant-card';
+            card.setAttribute('data-id', tenant.id);
+
+            const inClass = tenant.inTime ? 'time-col anim-target has-value' : 'time-col anim-target';
+            const outClass = tenant.outTime ? 'time-col anim-target has-value' : 'time-col anim-target';
+            
+            const displayInTime = tenant.inTime 
+                ? `${tenant.inTime} <span class="edit-mark">??</span>` 
+                : '<span class="time-placeholder">--:--</span>';
+            const displayOutTime = tenant.outTime 
+                ? `${tenant.outTime} <span class="edit-mark">??</span>` 
+                : '<span class="time-placeholder">--:--</span>';
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="name-wrapper anim-target">
+                        <span class="tenant-name-display">${tenant.name}</span>
+                        <span class="edit-mark">??</span>
+                    </div>
+                    <div class="drag-handle">?</div>
+                </div>
+
+                <div class="time-row">
+                    <div class="${inClass}" id="in-${tenant.id}">
+                        <span class="time-label">入室時間</span>
+                        <span class="time-value-display">${displayInTime}</span>
+                    </div>
+                    <div class="${outClass}" id="out-${tenant.id}">
+                        <span class="time-label">退室時間</span>
+                        <span class="time-value-display">${displayOutTime}</span>
+                    </div>
+                </div>
+
+                <div class="action-row" onmousedown="event.stopPropagation()">
+                    <button class="btn-action btn-in anim-target" id="btn-in-${tenant.id}">入室</button>
+                    <button class="btn-action btn-out anim-target" id="btn-out-${tenant.id}">退室</button>
+                    <button class="btn-delete anim-target" id="btn-del-${tenant.id}">???</button>
+                </div>
+            `;
+
+            const nameWrapper = card.querySelector('.name-wrapper');
+            nameWrapper.onclick = () => openModal(tenant.id, 'name');
+
+            const inCol = card.querySelector(`#in-${tenant.id}`);
+            inCol.onclick = () => openModal(tenant.id, 'in');
+
+            const outCol = card.querySelector(`#out-${tenant.id}`);
+            outCol.onclick = () => openModal(tenant.id, 'out');
+
+            const btnIn = card.querySelector(`#btn-in-${tenant.id}`);
+            btnIn.onclick = () => setNowTime(tenant.id, 'in');
+
+            const btnOut = card.querySelector(`#btn-out-${tenant.id}`);
+            btnOut.onclick = () => setNowTime(tenant.id, 'out');
+
+            const btnDel = card.querySelector(`#btn-del-${tenant.id}`);
+            btnDel.onclick = () => deleteTenant(tenant.id);
+
+            list.appendChild(card);
+        });
+    }
+</script>
+
+</body>
+</html>
