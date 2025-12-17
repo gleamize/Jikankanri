@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="robots" content="noindex, nofollow">
-    <title>テナント入退室管理（ボタン幅統一版）</title>
+    <title>テナント入退室管理（ボタン幅完全修正版）</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <style>
         /* 全要素に対して「線と余白を幅に含める」設定 */
@@ -107,6 +107,7 @@
         .tenant-card {
             background: var(--card-bg); border-radius: var(--border-radius-xl); padding: 20px;
             box-shadow: var(--shadow-md); position: relative; border: 1px solid #f1f5f9;
+            /* スクロールを許可 */
             touch-action: pan-y; 
         }
 
@@ -125,9 +126,11 @@
             font-size: 1.2rem; font-weight: 700; color: var(--text-color);
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 10px;
         }
+        /* ハンドル部分：スクロールを許可 */
         .drag-handle {
             font-size: 2rem; color: #d1d5db; padding: 5px 15px; cursor: grab;
-            transition: color 0.2s; touch-action: none; 
+            transition: color 0.2s; 
+            touch-action: pan-y; 
         }
         .drag-handle:active { color: var(--accent-color); }
 
@@ -171,40 +174,30 @@
         /* 共有画面 */
         .share-container { background: var(--card-bg); border-radius: var(--border-radius-xl); padding: 25px; box-shadow: var(--shadow-md); }
         
-        /* ヘッダーのレイアウトを修正 */
-        .share-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap; /* 折り返し許可 */
-            gap: 15px; /* 折り返し時の間隔 */
+        /* ヘッダー修正：縦並びにして幅を合わせる */
+        .share-header { 
+            display: flex; 
+            flex-direction: column; /* 縦並びに変更 */
+            gap: 15px; 
+            margin-bottom: 20px; 
         }
-        .share-title { font-size: 1.2rem; font-weight: 700; color: var(--text-color); margin-right: auto; }
-
-        /* ボタングループを横幅いっぱいに広げる */
-        .share-buttons {
-            display: flex;
-            gap: 10px; /* ボタン間の隙間 */
-            width: 100%; /* 横幅いっぱいにする */
-            flex-grow: 1; /* 折り返した際にスペースを埋める */
+        .share-title { 
+            font-size: 1.2rem; 
+            font-weight: 700; 
+            color: var(--text-color); 
         }
-
-        /* ボタンを等幅で広げる */
+        
+        /* ボタングループ：横幅100% */
+        .share-buttons { 
+            display: flex; 
+            gap: 10px; 
+            width: 100%; 
+        }
         .btn-copy, .btn-link {
-            flex: 1; /* 等幅で広がるように設定 */
-            border: none;
-            padding: 12px; /* パディングを調整 */
-            border-radius: var(--border-radius-lg);
-            font-weight: 700;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            box-shadow: var(--shadow-sm);
-            color: white;
-            white-space: nowrap;
+            flex: 1; /* 等幅で広げる */
+            border: none; padding: 12px; border-radius: var(--border-radius-lg);
+            font-weight: 700; font-size: 0.85rem; display: flex; align-items: center;
+            justify-content: center; gap: 6px; box-shadow: var(--shadow-sm); color: white; white-space: nowrap;
         }
         .btn-copy { background: var(--accent-color); }
         .btn-link { background: var(--link-color); }
