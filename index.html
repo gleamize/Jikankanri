@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="robots" content="noindex, nofollow">
-    <title>ƒeƒiƒ“ƒg“ü‘ŞºŠÇ—i30ŠÔ§•\¦‘Î‰j</title>
+    <title>ãƒ†ãƒŠãƒ³ãƒˆå…¥é€€å®¤ç®¡ç†ï¼ˆ30æ™‚é–“åˆ¶è¡¨ç¤ºå¯¾å¿œï¼‰</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <style>
-        /* ‘S—v‘f‚É‘Î‚µ‚Äuü‚Æ—]”’‚ğ•‚ÉŠÜ‚ß‚évİ’è */
+        /* å…¨è¦ç´ ã«å¯¾ã—ã¦ã€Œç·šã¨ä½™ç™½ã‚’å¹…ã«å«ã‚ã‚‹ã€è¨­å®š */
         *, *::before, *::after {
             box-sizing: border-box;
             -webkit-box-sizing: border-box;
@@ -168,7 +168,7 @@
         .sortable-ghost { opacity: 0.4; background: #e2e8f0; border: 2px dashed #94a3b8; }
         .sortable-drag { opacity: 1; background: #ffffff; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); transform: scale(1.02); z-index: 9999; }
 
-        /* ‹¤—L‰æ–Ê */
+        /* å…±æœ‰ç”»é¢ */
         .share-container { background: var(--card-bg); border-radius: var(--border-radius-xl); padding: 25px; box-shadow: var(--shadow-md); }
         .share-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .share-title { font-size: 1.2rem; font-weight: 700; color: var(--text-color); margin-right: auto; }
@@ -189,7 +189,7 @@
         .share-time-label { font-size: 0.8rem; color: #9ca3af; margin-right: 4px; }
         .time-accent { color: var(--text-color); font-weight: bold; }
 
-        /* ƒ‚[ƒ_ƒ‹ */
+        /* ãƒ¢ãƒ¼ãƒ€ãƒ« */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center;
@@ -271,27 +271,27 @@
 
 <div class="container">
     <header>
-        <h1>ƒeƒiƒ“ƒg“ü‘ŞºŠÇ—</h1>
+        <h1>ãƒ†ãƒŠãƒ³ãƒˆå…¥é€€å®¤ç®¡ç†</h1>
         <div id="dateDisplay"></div>
     </header>
 
     <div class="tabs-area anim-target">
-        <button class="tab-btn active" onclick="switchTab('input')">“ü—Í</button>
-        <button class="tab-btn" onclick="switchTab('share')">ƒf[ƒ^‹¤—L</button>
+        <button class="tab-btn active" onclick="switchTab('input')">å…¥åŠ›</button>
+        <button class="tab-btn" onclick="switchTab('share')">ãƒ‡ãƒ¼ã‚¿å…±æœ‰</button>
     </div>
 
     <div id="tab-input" class="tab-content active">
         <div class="controls-area">
-            <button id="btnUndo" class="btn-global btn-undo anim-target" onclick="executeUndo()" disabled>?? Œ³‚É–ß‚·</button>
-            <button class="btn-global btn-reset-time anim-target" onclick="resetAllTimes()">?? ŠÔƒNƒŠƒA</button>
+            <button id="btnUndo" class="btn-global btn-undo anim-target" onclick="executeUndo()" disabled>?? å…ƒã«æˆ»ã™</button>
+            <button class="btn-global btn-reset-time anim-target" onclick="resetAllTimes()">?? æ™‚é–“ã‚¯ãƒªã‚¢</button>
         </div>
 
         <div class="add-form">
-            <input type="text" id="tenantNameInput" class="input-large" placeholder="ƒeƒiƒ“ƒg–¼ (—á: Š”®‰ïĞA)">
-            <button class="btn-add anim-target" onclick="addTenant()">{ ’Ç‰Á‚·‚é</button>
+            <input type="text" id="tenantNameInput" class="input-large" placeholder="ãƒ†ãƒŠãƒ³ãƒˆå (ä¾‹: æ ªå¼ä¼šç¤¾A)">
+            <button class="btn-add anim-target" onclick="addTenant()">ï¼‹ è¿½åŠ ã™ã‚‹</button>
         </div>
         <div class="count-display">
-            “o˜^”: <span id="countDisplay">0</span> / 50
+            ç™»éŒ²æ•°: <span id="countDisplay">0</span> / 50
         </div>
 
         <div id="tenantList" class="tenant-list"></div>
@@ -300,15 +300,15 @@
     <div id="tab-share" class="tab-content">
         <div class="share-container">
             <div class="share-header">
-                <div class="share-title">“ü‘Şºˆê——</div>
+                <div class="share-title">å…¥é€€å®¤ä¸€è¦§</div>
                 <div class="share-buttons">
-                    <button class="btn-copy anim-target" onclick="copyShareText()">?? ƒeƒLƒXƒg‚ğƒRƒs[</button>
-                    <button class="btn-link anim-target" onclick="openKeijiban()">?? Œf¦”Â‚Å‹¤—L</button>
+                    <button class="btn-copy anim-target" onclick="copyShareText()">?? ãƒ†ã‚­ã‚¹ãƒˆã‚’ã‚³ãƒ”ãƒ¼</button>
+                    <button class="btn-link anim-target" onclick="openKeijiban()">?? æ²ç¤ºæ¿ã§å…±æœ‰</button>
                 </div>
             </div>
             <div id="shareList" class="share-list"></div>
             <div style="margin-top: 15px; text-align: center; font-size: 0.85rem; color: #9ca3af;">
-                ¦“ü—Í‚ª‚ ‚éƒf[ƒ^‚Ì‚İ•\¦‚³‚ê‚Ä‚¢‚Ü‚·
+                â€»å…¥åŠ›ãŒã‚ã‚‹ãƒ‡ãƒ¼ã‚¿ã®ã¿è¡¨ç¤ºã•ã‚Œã¦ã„ã¾ã™
             </div>
         </div>
     </div>
@@ -316,21 +316,21 @@
 
 <div id="editModal" class="modal-overlay">
     <div class="modal-content">
-        <div class="modal-title" id="modalTitle">•ÒW</div>
+        <div class="modal-title" id="modalTitle">ç·¨é›†</div>
         <div class="modal-input-group">
             <input type="text" id="modalNameInput" class="modal-input" style="display:none;">
             <input type="time" id="modalTimeInput" class="modal-input" style="display:none;">
         </div>
-        <button id="modalClearBtn" class="btn-modal-clear anim-target" style="display:none;" onclick="clearModalValue()">??? ŠÔ‚ğÁ‹‚·‚é</button>
+        <button id="modalClearBtn" class="btn-modal-clear anim-target" style="display:none;" onclick="clearModalValue()">??? æ™‚é–“ã‚’æ¶ˆå»ã™ã‚‹</button>
         <div class="modal-buttons">
-            <button class="btn-modal btn-modal-cancel anim-target" onclick="closeModal()">ƒLƒƒƒ“ƒZƒ‹</button>
-            <button class="btn-modal btn-modal-save anim-target" onclick="saveModal()">Œˆ’è ?</button>
+            <button class="btn-modal btn-modal-cancel anim-target" onclick="closeModal()">ã‚­ãƒ£ãƒ³ã‚»ãƒ«</button>
+            <button class="btn-modal btn-modal-save anim-target" onclick="saveModal()">æ±ºå®š ?</button>
         </div>
     </div>
 </div>
 
 <script>
-    // ƒAƒjƒ[ƒVƒ‡ƒ“
+    // ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³
     document.addEventListener('click', function(e) {
         const target = e.target.closest('button, .anim-target');
         if (target && !target.disabled) {
@@ -360,19 +360,19 @@
 
     function openKeijiban() { window.open('https://gleamize.github.io/keijiban/', '_blank'); }
 
-    // --- 30ŠÔ§•ÏŠ·ŠÖ” ---
+    // --- 30æ™‚é–“åˆ¶å¤‰æ›é–¢æ•° ---
     function to30h(timeStr) {
         if (!timeStr) return '--:--';
-        // "HH:mm" ‚ğ•ªŠ„‚µ‚Ä”’l‰»
+        // "HH:mm" ã‚’åˆ†å‰²ã—ã¦æ•°å€¤åŒ–
         const parts = timeStr.split(':');
         let h = parseInt(parts[0], 10);
         const m = parts[1];
 
-        // 0?6‚È‚ç+24‚·‚é
+        // 0æ™‚?6æ™‚ãªã‚‰+24ã™ã‚‹
         if (h <= 6) {
             h += 24;
         }
-        // ”’l‚ğ•¶š—ñ‚É–ß‚·i—á: 25:30j
+        // æ•°å€¤ã‚’æ–‡å­—åˆ—ã«æˆ»ã™ï¼ˆä¾‹: 25:30ï¼‰
         return `${h}:${m}`;
     }
 
@@ -393,14 +393,14 @@
         list.innerHTML = '';
         const activeTenants = tenants.filter(t => t.inTime || t.outTime);
         if (activeTenants.length === 0) {
-            list.innerHTML = '<div style="padding:40px 20px; text-align:center; color:#999;">‹L˜^ƒf[ƒ^‚Í‚ ‚è‚Ü‚¹‚ñ</div>';
+            list.innerHTML = '<div style="padding:40px 20px; text-align:center; color:#999;">è¨˜éŒ²ãƒ‡ãƒ¼ã‚¿ã¯ã‚ã‚Šã¾ã›ã‚“</div>';
             return;
         }
         activeTenants.forEach(tenant => {
             const item = document.createElement('div');
             item.className = 'share-item has-data';
             
-            // ‚±‚±‚Å30ŠÔ§‚É•ÏŠ·‚µ‚Ä•\¦
+            // ã“ã“ã§30æ™‚é–“åˆ¶ã«å¤‰æ›ã—ã¦è¡¨ç¤º
             const inTimeStr = tenant.inTime ? `<span class="time-accent">${to30h(tenant.inTime)}</span>` : '--:--';
             const outTimeStr = tenant.outTime ? `<span class="time-accent">${to30h(tenant.outTime)}</span>` : '--:--';
             
@@ -417,25 +417,25 @@
 
     function copyShareText() {
         const activeTenants = tenants.filter(t => t.inTime || t.outTime);
-        if (activeTenants.length === 0) return alert('‹L˜^ƒf[ƒ^‚ª‚ ‚è‚Ü‚¹‚ñ');
+        if (activeTenants.length === 0) return alert('è¨˜éŒ²ãƒ‡ãƒ¼ã‚¿ãŒã‚ã‚Šã¾ã›ã‚“');
         const dateStr = document.getElementById('dateDisplay').innerText;
-        let text = `y“ü‘Şº‹L˜^z ${dateStr}\n----------------\n`;
+        let text = `ã€å…¥é€€å®¤è¨˜éŒ²ã€‘ ${dateStr}\n----------------\n`;
         activeTenants.forEach(tenant => {
-            // ‚±‚±‚Å‚à30ŠÔ§‚É•ÏŠ·‚µ‚ÄƒeƒLƒXƒg¶¬
+            // ã“ã“ã§ã‚‚30æ™‚é–“åˆ¶ã«å¤‰æ›ã—ã¦ãƒ†ã‚­ã‚¹ãƒˆç”Ÿæˆ
             const inT = to30h(tenant.inTime);
             const outT = to30h(tenant.outTime);
-            text += `${tenant.name}\n“ü: ${inT}  ‘Ş: ${outT}\n\n`;
+            text += `${tenant.name}\nå…¥: ${inT}  é€€: ${outT}\n\n`;
         });
         if (navigator.clipboard) {
-            navigator.clipboard.writeText(text).then(() => alert('ƒRƒs[‚µ‚Ü‚µ‚½I')).catch(() => alert('ƒRƒs[¸”s'));
+            navigator.clipboard.writeText(text).then(() => alert('ã‚³ãƒ”ãƒ¼ã—ã¾ã—ãŸï¼')).catch(() => alert('ã‚³ãƒ”ãƒ¼å¤±æ•—'));
         } else {
             const ta = document.createElement('textarea');
             ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-            alert('ƒRƒs[‚µ‚Ü‚µ‚½I');
+            alert('ã‚³ãƒ”ãƒ¼ã—ã¾ã—ãŸï¼');
         }
     }
 
-    // --- ƒƒCƒ“‹@”\ ---
+    // --- ãƒ¡ã‚¤ãƒ³æ©Ÿèƒ½ ---
     function initSortable() {
         const el = document.getElementById('tenantList');
         sortableInstance = Sortable.create(el, {
@@ -454,8 +454,8 @@
 
     function displayDate() {
         const now = new Date();
-        const days = ['“ú', 'Œ', '‰Î', '…', '–Ø', '‹à', '“y'];
-        document.getElementById('dateDisplay').textContent = `${now.getFullYear()}”N${now.getMonth() + 1}Œ${now.getDate()}“ú(${days[now.getDay()]})`;
+        const days = ['æ—¥', 'æœˆ', 'ç«', 'æ°´', 'æœ¨', 'é‡‘', 'åœŸ'];
+        document.getElementById('dateDisplay').textContent = `${now.getFullYear()}å¹´${now.getMonth() + 1}æœˆ${now.getDate()}æ—¥(${days[now.getDay()]})`;
     }
     function saveData() { localStorage.setItem('mobileTenantApp_v7_30h', JSON.stringify(tenants)); }
     function saveHistory() {
@@ -477,9 +477,9 @@
     function addTenant() {
         const input = document.getElementById('tenantNameInput');
         const name = input.value.trim();
-        if (!name) return alert('ƒeƒiƒ“ƒg–¼‚ğ“ü—Í');
-        if (tenants.length >= 50) return alert('“o˜^ãŒÀ‚Å‚·');
-        if (tenants.some(t => t.name === name)) return alert('“o˜^Ï‚İ‚Å‚·');
+        if (!name) return alert('ãƒ†ãƒŠãƒ³ãƒˆåã‚’å…¥åŠ›');
+        if (tenants.length >= 50) return alert('ç™»éŒ²ä¸Šé™ã§ã™');
+        if (tenants.some(t => t.name === name)) return alert('ç™»éŒ²æ¸ˆã¿ã§ã™');
         saveHistory();
         tenants.push({ id: Date.now(), name: name, inTime: '', outTime: '' });
         input.value = '';
@@ -487,7 +487,7 @@
         renderTenants();
     }
     function deleteTenant(id) {
-        if(!confirm('íœ‚µ‚Ü‚·‚©H')) return;
+        if(!confirm('å‰Šé™¤ã—ã¾ã™ã‹ï¼Ÿ')) return;
         saveHistory();
         tenants = tenants.filter(t => t.id !== id);
         saveData();
@@ -503,14 +503,14 @@
         }
     }
     function resetAllTimes() {
-        if(!confirm('‘SƒŠƒZƒbƒg‚µ‚Ü‚·‚©H')) return;
+        if(!confirm('å…¨ãƒªã‚»ãƒƒãƒˆã—ã¾ã™ã‹ï¼Ÿ')) return;
         saveHistory();
         tenants.forEach(t => { t.inTime = ''; t.outTime = ''; });
         saveData();
         renderTenants();
     }
 
-    // --- •ÒWƒ‚[ƒ_ƒ‹§Œä ---
+    // --- ç·¨é›†ãƒ¢ãƒ¼ãƒ€ãƒ«åˆ¶å¾¡ ---
     function openModal(id, type) {
         const tenant = tenants.find(t => t.id === id);
         if (!tenant) return;
@@ -529,12 +529,12 @@
         clearBtn.style.display = 'none';
 
         if (type === 'name') {
-            title.innerText = 'ƒeƒiƒ“ƒg–¼‚Ì•ÒW';
+            title.innerText = 'ãƒ†ãƒŠãƒ³ãƒˆåã®ç·¨é›†';
             nameInput.style.display = 'block';
             nameInput.value = tenant.name;
             setTimeout(() => nameInput.focus(), 300);
         } else {
-            title.innerText = (type === 'in' ? '“üº' : '‘Şº') + 'ŠÔ‚Ì•ÒW';
+            title.innerText = (type === 'in' ? 'å…¥å®¤' : 'é€€å®¤') + 'æ™‚é–“ã®ç·¨é›†';
             timeInput.style.display = 'block';
             timeInput.value = (type === 'in' ? tenant.inTime : tenant.outTime);
             clearBtn.style.display = 'block';
@@ -570,7 +570,7 @@
         closeModal();
     }
 
-    // --- •`‰æ ---
+    // --- æç”» ---
     function renderTenants() {
         const list = document.getElementById('tenantList');
         document.getElementById('countDisplay').innerText = tenants.length;
@@ -602,18 +602,18 @@
 
                 <div class="time-row">
                     <div class="${inClass}" id="in-${tenant.id}">
-                        <span class="time-label">“üºŠÔ</span>
+                        <span class="time-label">å…¥å®¤æ™‚é–“</span>
                         <span class="time-value-display">${displayInTime}</span>
                     </div>
                     <div class="${outClass}" id="out-${tenant.id}">
-                        <span class="time-label">‘ŞºŠÔ</span>
+                        <span class="time-label">é€€å®¤æ™‚é–“</span>
                         <span class="time-value-display">${displayOutTime}</span>
                     </div>
                 </div>
 
                 <div class="action-row" onmousedown="event.stopPropagation()">
-                    <button class="btn-action btn-in anim-target" id="btn-in-${tenant.id}">“üº</button>
-                    <button class="btn-action btn-out anim-target" id="btn-out-${tenant.id}">‘Şº</button>
+                    <button class="btn-action btn-in anim-target" id="btn-in-${tenant.id}">å…¥å®¤</button>
+                    <button class="btn-action btn-out anim-target" id="btn-out-${tenant.id}">é€€å®¤</button>
                     <button class="btn-delete anim-target" id="btn-del-${tenant.id}">???</button>
                 </div>
             `;
