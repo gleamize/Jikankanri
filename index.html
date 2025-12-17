@@ -282,8 +282,8 @@
 
     <div id="tab-input" class="tab-content active">
         <div class="controls-area">
-            <button id="btnUndo" class="btn-global btn-undo anim-target" onclick="executeUndo()" disabled>?? 元に戻す</button>
-            <button class="btn-global btn-reset-time anim-target" onclick="resetAllTimes()">?? 時間クリア</button>
+            <button id="btnUndo" class="btn-global btn-undo anim-target" onclick="executeUndo()" disabled>↩️ 元に戻す</button>
+            <button class="btn-global btn-reset-time anim-target" onclick="resetAllTimes()">🕒 時間クリア</button>
         </div>
 
         <div class="add-form">
@@ -302,8 +302,8 @@
             <div class="share-header">
                 <div class="share-title">入退室一覧</div>
                 <div class="share-buttons">
-                    <button class="btn-copy anim-target" onclick="copyShareText()">?? テキストをコピー</button>
-                    <button class="btn-link anim-target" onclick="openKeijiban()">?? 掲示板で共有</button>
+                    <button class="btn-copy anim-target" onclick="copyShareText()">📋 テキストをコピー</button>
+                    <button class="btn-link anim-target" onclick="openKeijiban()">🚀 掲示板で共有</button>
                 </div>
             </div>
             <div id="shareList" class="share-list"></div>
@@ -321,10 +321,10 @@
             <input type="text" id="modalNameInput" class="modal-input" style="display:none;">
             <input type="time" id="modalTimeInput" class="modal-input" style="display:none;">
         </div>
-        <button id="modalClearBtn" class="btn-modal-clear anim-target" style="display:none;" onclick="clearModalValue()">??? 時間を消去する</button>
+        <button id="modalClearBtn" class="btn-modal-clear anim-target" style="display:none;" onclick="clearModalValue()">🗑️ 時間を消去する</button>
         <div class="modal-buttons">
             <button class="btn-modal btn-modal-cancel anim-target" onclick="closeModal()">キャンセル</button>
-            <button class="btn-modal btn-modal-save anim-target" onclick="saveModal()">決定 ?</button>
+            <button class="btn-modal btn-modal-save anim-target" onclick="saveModal()">決定 ✅</button>
         </div>
     </div>
 </div>
@@ -368,7 +368,7 @@
         let h = parseInt(parts[0], 10);
         const m = parts[1];
 
-        // 0時?6時なら+24する
+        // 0時〜6時なら+24する
         if (h <= 6) {
             h += 24;
         }
@@ -585,19 +585,19 @@
             const outClass = tenant.outTime ? 'time-col anim-target has-value' : 'time-col anim-target';
             
             const displayInTime = tenant.inTime 
-                ? `${tenant.inTime} <span class="edit-mark">??</span>` 
+                ? `${tenant.inTime} <span class="edit-mark">✏️</span>` 
                 : '<span class="time-placeholder">--:--</span>';
             const displayOutTime = tenant.outTime 
-                ? `${tenant.outTime} <span class="edit-mark">??</span>` 
+                ? `${tenant.outTime} <span class="edit-mark">✏️</span>` 
                 : '<span class="time-placeholder">--:--</span>';
 
             card.innerHTML = `
                 <div class="card-header">
                     <div class="name-wrapper anim-target">
                         <span class="tenant-name-display">${tenant.name}</span>
-                        <span class="edit-mark">??</span>
+                        <span class="edit-mark">✏️</span>
                     </div>
-                    <div class="drag-handle">?</div>
+                    <div class="drag-handle">☰</div>
                 </div>
 
                 <div class="time-row">
@@ -614,7 +614,7 @@
                 <div class="action-row" onmousedown="event.stopPropagation()">
                     <button class="btn-action btn-in anim-target" id="btn-in-${tenant.id}">入室</button>
                     <button class="btn-action btn-out anim-target" id="btn-out-${tenant.id}">退室</button>
-                    <button class="btn-delete anim-target" id="btn-del-${tenant.id}">???</button>
+                    <button class="btn-delete anim-target" id="btn-del-${tenant.id}">🗑️</button>
                 </div>
             `;
 
