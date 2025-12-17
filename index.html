@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="robots" content="noindex, nofollow">
-    <title>テナント入退室管理（30時間制表示対応）</title>
+    <title>テナント入退室管理（ボタン幅統一版）</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <style>
         /* 全要素に対して「線と余白を幅に含める」設定 */
@@ -170,16 +170,45 @@
 
         /* 共有画面 */
         .share-container { background: var(--card-bg); border-radius: var(--border-radius-xl); padding: 25px; box-shadow: var(--shadow-md); }
-        .share-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        
+        /* ヘッダーのレイアウトを修正 */
+        .share-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* 折り返し許可 */
+            gap: 15px; /* 折り返し時の間隔 */
+        }
         .share-title { font-size: 1.2rem; font-weight: 700; color: var(--text-color); margin-right: auto; }
-        .share-buttons { display: flex; gap: 8px; }
+
+        /* ボタングループを横幅いっぱいに広げる */
+        .share-buttons {
+            display: flex;
+            gap: 10px; /* ボタン間の隙間 */
+            width: 100%; /* 横幅いっぱいにする */
+            flex-grow: 1; /* 折り返した際にスペースを埋める */
+        }
+
+        /* ボタンを等幅で広げる */
         .btn-copy, .btn-link {
-            border: none; padding: 10px 16px; border-radius: var(--border-radius-lg);
-            font-weight: 700; font-size: 0.85rem; display: flex; align-items: center;
-            justify-content: center; gap: 6px; box-shadow: var(--shadow-sm); color: white; white-space: nowrap;
+            flex: 1; /* 等幅で広がるように設定 */
+            border: none;
+            padding: 12px; /* パディングを調整 */
+            border-radius: var(--border-radius-lg);
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: var(--shadow-sm);
+            color: white;
+            white-space: nowrap;
         }
         .btn-copy { background: var(--accent-color); }
         .btn-link { background: var(--link-color); }
+
         .share-list { display: flex; flex-direction: column; gap: 0; border: 1px solid #e5e7eb; border-radius: var(--border-radius-lg); overflow: hidden; }
         .share-item { padding: 15px; border-bottom: 1px solid #f1f5f9; background: #fff; display: flex; flex-direction: column; gap: 5px; }
         .share-item:last-child { border-bottom: none; }
@@ -306,7 +335,9 @@
                     <button class="btn-link anim-target" onclick="openKeijiban()">💬 掲示板で共有</button>
                 </div>
             </div>
-            <div id="shareList" class="share-list"></div>
+            <div id="shareList" class="share-list">
+                <div style="padding:40px 20px; text-align:center; color:#999;">記録データはありません</div>
+            </div>
             <div style="margin-top: 15px; text-align: center; font-size: 0.85rem; color: #9ca3af;">
                 ※入力があるデータのみ表示されています
             </div>
@@ -363,16 +394,12 @@
     // --- 30時間制変換関数 ---
     function to30h(timeStr) {
         if (!timeStr) return '--:--';
-        // "HH:mm" を分割して数値化
         const parts = timeStr.split(':');
         let h = parseInt(parts[0], 10);
         const m = parts[1];
-
-        // 0時〜6時なら+24する
         if (h <= 6) {
             h += 24;
         }
-        // 数値を文字列に戻す（例: 25:30）
         return `${h}:${m}`;
     }
 
@@ -400,7 +427,6 @@
             const item = document.createElement('div');
             item.className = 'share-item has-data';
             
-            // ここで30時間制に変換して表示
             const inTimeStr = tenant.inTime ? `<span class="time-accent">${to30h(tenant.inTime)}</span>` : '--:--';
             const outTimeStr = tenant.outTime ? `<span class="time-accent">${to30h(tenant.outTime)}</span>` : '--:--';
             
@@ -421,7 +447,6 @@
         const dateStr = document.getElementById('dateDisplay').innerText;
         let text = `【入退室記録】 ${dateStr}\n----------------\n`;
         activeTenants.forEach(tenant => {
-            // ここでも30時間制に変換してテキスト生成
             const inT = to30h(tenant.inTime);
             const outT = to30h(tenant.outTime);
             text += `${tenant.name}\n入: ${inT}  退: ${outT}\n\n`;
@@ -643,4 +668,3 @@
 
 </body>
 </html>
-
