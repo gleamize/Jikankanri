@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="robots" content="noindex, nofollow">
-    <title>テナント入退室管理（ボタン幅完全修正版）</title>
+    <title>テナント入退室管理（日付自動調整版）</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <style>
         /* 全要素に対して「線と余白を幅に含める」設定 */
@@ -177,7 +177,7 @@
         /* ヘッダー修正：縦並びにして幅を合わせる */
         .share-header { 
             display: flex; 
-            flex-direction: column; /* 縦並びに変更 */
+            flex-direction: column; 
             gap: 15px; 
             margin-bottom: 20px; 
         }
@@ -325,7 +325,7 @@
                 <div class="share-title">入退室一覧</div>
                 <div class="share-buttons">
                     <button class="btn-copy anim-target" onclick="copyShareText()">📋 文字をコピー</button>
-                    <button class="btn-link anim-target" onclick="openKeijiban()">💬 掲示板で共有</button>
+                    <button class="btn-link anim-target" onclick="openKeijiban()">🚀 掲示板で共有</button>
                 </div>
             </div>
             <div id="shareList" class="share-list">
@@ -434,10 +434,22 @@
         });
     }
 
+    // --- コピー機能（日付自動調整ロジック入り） ---
     function copyShareText() {
         const activeTenants = tenants.filter(t => t.inTime || t.outTime);
         if (activeTenants.length === 0) return alert('記録データがありません');
-        const dateStr = document.getElementById('dateDisplay').innerText;
+
+        // --- 日付計算ロジック ---
+        const now = new Date();
+        // 0時～6時の間は、業務日としては「前日」とみなす
+        if (now.getHours() < 6) {
+            now.setDate(now.getDate() - 1);
+        }
+        
+        const days = ['日', '月', '火', '水', '木', '金', '土'];
+        const dateStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日(${days[now.getDay()]})`;
+        // -----------------------
+
         let text = `【入退室記録】 ${dateStr}\n----------------\n`;
         activeTenants.forEach(tenant => {
             const inT = to30h(tenant.inTime);
