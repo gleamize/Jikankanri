@@ -304,8 +304,8 @@
 
     <div id="tab-input" class="tab-content active">
         <div class="controls-area">
-            <button id="btnUndo" class="btn-global btn-undo anim-target" onclick="executeUndo()" disabled>↩️ 元に戻す</button>
-            <button class="btn-global btn-reset-time anim-target" onclick="resetAllTimes()">🕒 時間クリア</button>
+            <button id="btnUndo" class="btn-global btn-undo anim-target" onclick="executeUndo()" disabled>?? 元に戻す</button>
+            <button class="btn-global btn-reset-time anim-target" onclick="resetAllTimes()">?? 時間クリア</button>
         </div>
 
         <div class="add-form">
@@ -324,8 +324,8 @@
             <div class="share-header">
                 <div class="share-title">入退室一覧</div>
                 <div class="share-buttons">
-                    <button class="btn-copy anim-target" onclick="copyShareText()">📋 文字をコピー</button>
-                    <button class="btn-link anim-target" onclick="openKeijiban()">💬 掲示板で共有</button>
+                    <button class="btn-copy anim-target" onclick="copyShareText()">?? 文字をコピー</button>
+                    <button class="btn-link anim-target" onclick="openKeijiban()">?? 掲示板で共有</button>
                 </div>
             </div>
             <div id="shareList" class="share-list">
@@ -345,10 +345,10 @@
             <input type="text" id="modalNameInput" class="modal-input" style="display:none;">
             <input type="time" id="modalTimeInput" class="modal-input" style="display:none;">
         </div>
-        <button id="modalClearBtn" class="btn-modal-clear anim-target" style="display:none;" onclick="clearModalValue()">🗑️ 時間を消去する</button>
+        <button id="modalClearBtn" class="btn-modal-clear anim-target" style="display:none;" onclick="clearModalValue()">??? 時間を消去する</button>
         <div class="modal-buttons">
             <button class="btn-modal btn-modal-cancel anim-target" onclick="closeModal()">キャンセル</button>
-            <button class="btn-modal btn-modal-save anim-target" onclick="saveModal()">決定 ✅</button>
+            <button class="btn-modal btn-modal-save anim-target" onclick="saveModal()">決定 ?</button>
         </div>
     </div>
 </div>
@@ -434,7 +434,7 @@
         });
     }
 
-    // --- コピー機能（日付自動調整ロジック入り） ---
+    // --- コピー機能（完全網羅版：日付自動調整＋3段構えのフォールバック） ---
     function copyShareText() {
         const activeTenants = tenants.filter(t => t.inTime || t.outTime);
         if (activeTenants.length === 0) return alert('記録データがありません');
@@ -456,12 +456,70 @@
             const outT = to30h(tenant.outTime);
             text += `${tenant.name}\n入: ${inT}  退: ${outT}\n\n`;
         });
-        if (navigator.clipboard) {
-            navigator.clipboard.writeText(text).then(() => alert('コピーしました！')).catch(() => alert('コピー失敗'));
-        } else {
+
+        // 【最終手段】自動コピーが完全にブロックされた場合に、手動コピー用のテキスト枠を表示する関数
+        const showManualFallback = () => {
+            alert('お使いのブラウザでは自動コピーが制限されています。画面下に表示されたテキストを長押ししてコピーしてください。');
+            let fallbackArea = document.getElementById('fallback-textarea');
+            if (!fallbackArea) {
+                // テキスト枠を作成してデータ共有タブの下部に追加
+                fallbackArea = document.createElement('textarea');
+                fallbackArea.id = 'fallback-textarea';
+                fallbackArea.style.width = '100%';
+                fallbackArea.style.height = '150px';
+                fallbackArea.style.marginTop = '15px';
+                fallbackArea.style.padding = '10px';
+                fallbackArea.style.border = '2px solid var(--danger-color)'; // 赤枠で目立たせる
+                fallbackArea.style.borderRadius = 'var(--border-radius-lg)';
+                fallbackArea.style.fontSize = '1rem';
+                document.querySelector('.share-container').appendChild(fallbackArea);
+            }
+            fallbackArea.value = text;
+            fallbackArea.scrollIntoView({ behavior: 'smooth' }); // 自動で下までスクロールさせる
+        };
+
+        // 【第二手段】互換性を高めた古いコピー処理を実行する関数
+        const executeLegacyCopy = () => {
             const ta = document.createElement('textarea');
-            ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-            alert('コピーしました！');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            ta.style.top = '0';
+            ta.setAttribute('readonly', 'readonly');
+            document.body.appendChild(ta);
+            ta.select();
+            ta.setSelectionRange(0, 999999);
+            
+            try {
+                const successful = document.execCommand('copy');
+                document.body.removeChild(ta);
+                return successful;
+            } catch (err) {
+                document.body.removeChild(ta);
+                return false;
+            }
+        };
+
+        // コピー処理の実行ルート
+        // 1. 最新のAPIが存在し、かつ安全な通信環境（HTTPS）であるかチェック
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text)
+                .then(() => alert('コピーしました！'))
+                .catch(() => {
+                    // 最新APIで失敗した場合（権限拒否など）、第二手段を試す
+                    if (executeLegacyCopy()) {
+                        alert('コピーしました！');
+                    } else {
+                        showManualFallback(); // 全てダメなら最終手段
+                    }
+                });
+        } else {
+            // HTTP環境など、最初から最新APIが使えない場合は第二手段から試す
+            if (executeLegacyCopy()) {
+                alert('コピーしました！');
+            } else {
+                showManualFallback(); // ダメなら最終手段
+            }
         }
     }
 
@@ -615,19 +673,19 @@
             const outClass = tenant.outTime ? 'time-col anim-target has-value' : 'time-col anim-target';
             
             const displayInTime = tenant.inTime 
-                ? `${tenant.inTime} <span class="edit-mark">✏️</span>` 
+                ? `${tenant.inTime} <span class="edit-mark">??</span>` 
                 : '<span class="time-placeholder">--:--</span>';
             const displayOutTime = tenant.outTime 
-                ? `${tenant.outTime} <span class="edit-mark">✏️</span>` 
+                ? `${tenant.outTime} <span class="edit-mark">??</span>` 
                 : '<span class="time-placeholder">--:--</span>';
 
             card.innerHTML = `
                 <div class="card-header">
                     <div class="name-wrapper anim-target">
                         <span class="tenant-name-display">${tenant.name}</span>
-                        <span class="edit-mark">✏️</span>
+                        <span class="edit-mark">??</span>
                     </div>
-                    <div class="drag-handle">☰</div>
+                    <div class="drag-handle">?</div>
                 </div>
 
                 <div class="time-row">
@@ -644,7 +702,7 @@
                 <div class="action-row" onmousedown="event.stopPropagation()">
                     <button class="btn-action btn-in anim-target" id="btn-in-${tenant.id}">入室</button>
                     <button class="btn-action btn-out anim-target" id="btn-out-${tenant.id}">退室</button>
-                    <button class="btn-delete anim-target" id="btn-del-${tenant.id}">🗑️</button>
+                    <button class="btn-delete anim-target" id="btn-del-${tenant.id}">???</button>
                 </div>
             `;
 
